@@ -457,7 +457,7 @@ class Trainer(object):
         assert len(y) == (len2 - 1).sum().item()
 
         # cuda
-        x1, len1, x2, len2, y = to_cuda(x1, len1, x2, len2, y)
+        x1, len1, x2, len2, y = to_cuda([x1, len1, x2, len2, y], cpu=params.cpu)
 
         # forward / loss
         encoded = encoder('fwd', x=x1, lengths=len1, causal=False)

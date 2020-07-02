@@ -25,9 +25,6 @@ from .logger import create_logger
 FALSY_STRINGS = {'off', 'false', '0'}
 TRUTHY_STRINGS = {'on', 'true', '1'}
 
-CUDA = True
-
-
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
@@ -120,11 +117,11 @@ def get_dump_path(params):
         subprocess.Popen("mkdir -p %s" % params.dump_path, shell=True).wait()
 
 
-def to_cuda(*args):
+def to_cuda(args, *, cpu=False):
     """
     Move tensors to CUDA.
     """
-    if not CUDA:
+    if cpu:
         return args
     return [None if x is None else x.cuda() for x in args]
 

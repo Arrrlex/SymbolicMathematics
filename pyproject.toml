@@ -11,6 +11,7 @@ sympy = "^1.6"
 numexpr = "^2.7.1"
 
 [tool.poetry.dev-dependencies]
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
