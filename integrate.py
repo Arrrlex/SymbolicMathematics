@@ -16,7 +16,6 @@ def load_settings(**kwargs):
     default_settings = json.load((project_root / 'default_settings.json').open())
     params = default_settings
     params.update(kwargs)
-    params['reload_model'] = str(project_root / 'dumped' / 'fwd_bwd_ibp.pth')
     return AttrDict(params)
 
 class Integrator(object):
