@@ -22,9 +22,9 @@ def load_settings(**kwargs):
 class Integrator(object):
     def __init__(self, cpu, model_path):
         self.params = load_settings(cpu=cpu, reload_model=model_path)
-        self.env = build_env(params)
+        self.env = build_env(self.params)
         
-        self.modules = build_modules(env, params)
+        self.modules = build_modules(self.env, self.params)
         self.encoder = modules['encoder']
         self.decoder = modules['decoder']
 
