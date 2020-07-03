@@ -24,8 +24,8 @@ class Integrator(object):
         self.env = build_env(self.params)
         
         self.modules = build_modules(self.env, self.params)
-        self.encoder = modules['encoder']
-        self.decoder = modules['decoder']
+        self.encoder = self.modules['encoder']
+        self.decoder = self.modules['decoder']
 
 
     def to_tensor(self, expr):
