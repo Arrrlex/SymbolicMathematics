@@ -56,7 +56,7 @@ class Integrator(object):
             infix = self.env.prefix_to_infix(tokens)
             hypothesis = self.env.infix_to_sympy(infix)
             
-            if simplify(hypothesis.diff(x) - expr, seconds=1) == 0:
+            if simplify(hypothesis.diff(self.env.local_dict['x']) - expr, seconds=1) == 0:
                 return hypothesis
             
             return None
