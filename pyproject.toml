@@ -3,12 +3,16 @@ name = "symbolicmathematics"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
+packages = [
+    { include = "integrate.py" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 torch = "^1.5.1"
 sympy = "^1.6"
 numexpr = "^2.7.1"
+antlr4-python3-runtime = ">=4.8"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"
