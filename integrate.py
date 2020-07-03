@@ -61,7 +61,7 @@ class Integrator(object):
             
             return None
 
-    def integrate(f):
+    def integrate(self, f):
         expr = parse_latex(f)
         tensor, length = self.to_tensor(expr)
         hypothesis = self.generate_hypotheses(tensor, length)
