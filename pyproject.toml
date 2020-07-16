@@ -2,7 +2,7 @@
 name = "symbolicmathematics"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Guillaume Lample <glample@fb.com>", "François Charton <fcharton@fb.com>"]
 packages = [
     { include = "integrate.py" }
 ]
