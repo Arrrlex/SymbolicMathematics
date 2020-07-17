@@ -1,38 +1,28 @@
-import json
-import pathlib
 from typing import Optional
 
 from sympy.parsing.latex import parse_latex
-import sympy
+import sympy as sp
 import torch
 from func_timeout import FunctionTimedOut
 
-from src.utils import AttrDict, to_cuda
+from src.utils import to_cuda, load_settings
 from src.envs import build_env
 from src.model import build_modules
 from src.envs.sympy_utils import simplify
 from src.envs.char_sp import InvalidPrefixExpression
 
-project_root = pathlib.Path(__file__).parent
-
 def preprocess(expr):
-    e = sympy.S('e')
+    e = sp.S('e')
     exponential_subexprs = [subexpr 
-            for subexpr in sympy.preorder_traversal(expr)
-            if subexpr.func == sympy.Pow and subexpr.base == e]
-    fixed_subexprs = [sympy.exp(subexpr.exp) for subexpr in exponential_subexprs]
+            for subexpr in sp.preorder_traversal(expr)
+            if subexpr.func == sp.Pow and subexpr.base == e]
+    fixed_subexprs = [sp.exp(subexpr.exp) for subexpr in exponential_subexprs]
 
     fixed_expr = expr
     for (old, new) in zip(exponential_subexprs, fixed_subexprs):
         fixed_expr = fixed_expr.subs(old, new)
 
     return fixed_expr
-
-def load_settings(**kwargs):
-    default_settings = json.load((project_root / 'default_settings.json').open())
-    params = default_settings
-    params.update(kwargs)
-    return AttrDict(params)
 
 class Integrator(object):
     def __init__(self, cpu, model_path):
@@ -97,14 +87,19 @@ class Integrator(object):
             expr = parse_latex(f)
             expr_fixed = preprocess(expr)
             antiderivative = self.integrate_sympy(expr_fixed)
-        except:
-            expr = sympy.sympify(f, locals=self.env.local_dict)
-            antiderivative = self.integrate_sympy(expr_fixed)
-
-        return sympy.latex(antiderivative)
+        except Exception as e:
+            print("Error thrown assuming latex:", e)
+            try:
+                expr = sp.sympify(f, locals=self.env.local_dict)
+                print(sp.srepr(expr))
+                antiderivative = self.integrate_sympy(expr_fixed)
+            except Exception as e:
+                print("Error thrown assuming python:", e)
+                return None
+        return sp.latex(antiderivative)
 
     def integrate_pyexpr(self, f):
-        expr = sympy.sympify(f, locals=self.env.local_dict)
+        expr = sp.sympify(f, locals=self.env.local_dict)
         return self.integrate_sympy(expr)
 
     def integrate_latex(self, f):

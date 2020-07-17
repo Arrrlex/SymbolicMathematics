@@ -14,9 +14,12 @@ import pickle
 import random
 import argparse
 import subprocess
+from pathlib import Path
 
 import errno
 from functools import wraps, partial
+
+import yaml
 
 from .logger import create_logger
 
@@ -24,10 +27,39 @@ from .logger import create_logger
 FALSY_STRINGS = {'off', 'false', '0'}
 TRUTHY_STRINGS = {'on', 'true', '1'}
 
+PROJECT_ROOT = Path(__file__).parent.parent
+PACKAGE_ROOT = Path(__file__).parent
+
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
+
+
+def load_settings(*, cpu, model_name=None, model_path=None, **override_defaults):
+    """
+    Load default settings for project, with any required overrides.
+
+    :param cpu: bool. Whether computation should be cpu-bound or not.
+    :param model_name: the name of the model to load, e.g. fwd_bwd, fwd_bwd_ibp
+    :param model_path: the path to the model to load
+
+    Note: exactly one of model_name and model_path should be given.
+    """
+    with (PACKAGE_ROOT / 'default_settings.yaml').open() as f:
+        params = yaml.load(f, Loader=yaml.Loader)
+
+    if (model_name and model_path) or (not model_name and model_path):
+        raise Exception("Exactly one of model_name and model_path should be specified")
+    
+    if model_name:
+        model_path = PACKAGE_ROOT / 'dumped' / (model_name + '.pth')
+
+    params['reload_model'] = model_path
+    params['cpu'] = cpu
+
+    params.update(override_defaults)
+    return AttrDict(params)
 
 
 def bool_flag(s):

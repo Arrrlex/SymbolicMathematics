@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Guillaume Lample <glample@fb.com>", "François Charton <fcharton@fb.com>"]
 packages = [
-    { include = "integrate.py" }
+  { include = "symbolicmathematics/default_settings.yaml" }
 ]
 
 [tool.poetry.dependencies]
@@ -14,6 +14,7 @@ sympy = "^1.6"
 numexpr = "^2.7.1"
 antlr4-python3-runtime = ">=4.8"
 func_timeout = "^4.3.5"
+pyyaml = "^5.3.1"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"

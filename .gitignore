@@ -126,5 +126,5 @@ dmypy.json
 # tools, data, and dumped models
 # /tools
 /data
-/dumped
+symbolicmathematics/dumped
 .vscode
