@@ -4,9 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["Guillaume Lample <glample@fb.com>", "François Charton <fcharton@fb.com>"]
 packages = [
-  { include = "symbolicmathematics/default_settings.yaml" },
   { include = "symbolicmathematics" }
 ]
+
+include = [ "symbolicmathematics/default_settings.yaml" ]
 
 [tool.poetry.dependencies]
 python = "^3.8"
