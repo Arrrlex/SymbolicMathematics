@@ -49,7 +49,7 @@ def load_settings(cpu, model_name=None, model_path=None, **override_defaults):
     with (PACKAGE_ROOT / 'default_settings.yaml').open() as f:
         params = yaml.load(f, Loader=yaml.Loader)
 
-    if (model_name and model_path) or (not model_name and model_path):
+    if (model_name and model_path) or (not model_name and not model_path):
         raise Exception("Exactly one of model_name and model_path should be specified")
     
     if model_name:
