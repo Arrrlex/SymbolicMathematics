@@ -92,6 +92,17 @@ class Integrator(object):
         print("No hypothesis was correct.")
         return None
 
+    def integrate(self, f):
+        try:
+            expr = parse_latex(f)
+            expr_fixed = preprocess(expr)
+            antiderivative = self.integrate_sympy(expr_fixed)
+        except:
+            expr = sympy.sympify(f, locals=self.env.local_dict)
+            antiderivative = self.integrate_sympy(expr_fixed)
+
+        return latex(antiderivative)
+
     def integrate_pyexpr(self, f):
         expr = sympy.sympify(f, locals=self.env.local_dict)
         return self.integrate_sympy(expr)
