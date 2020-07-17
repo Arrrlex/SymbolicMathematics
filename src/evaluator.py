@@ -11,8 +11,9 @@ from concurrent.futures import ProcessPoolExecutor
 import os
 import torch
 import sympy as sp
+from func_timeout import func_set_timeout, FunctionTimedOut
 
-from .utils import to_cuda, timeout, TimeoutError
+from .utils import to_cuda
 from .envs.char_sp import InvalidPrefixExpression, is_valid_expr
 from .envs.sympy_utils import simplify
 
@@ -34,7 +35,7 @@ def idx_to_sp(env, idx, return_infix=False):
     return (eq, infix) if return_infix else eq
 
 
-@timeout(5)
+@func_set_timeout(5)
 def check_valid_solution(env, src, tgt, hyp):
     """
     Check that a solution is valid.

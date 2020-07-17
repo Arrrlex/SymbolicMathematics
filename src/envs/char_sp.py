@@ -23,9 +23,10 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy.core.cache import clear_cache
 from sympy.integrals.risch import NonElementaryIntegral
 from sympy.calculus.util import AccumBounds
+from func_timeout import func_set_timeout, FunctionTimedOut
 
 from ..utils import bool_flag
-from ..utils import timeout, TimeoutError
+#from ..utils import timeout, FunctionTimedOut
 from .sympy_utils import remove_root_constant_terms, reduce_coefficients, reindex_coefficients
 from .sympy_utils import extract_non_constant_subtree, simplify_const_with_coeff, simplify_equa_diff, clean_degree2_solution
 from .sympy_utils import remove_mul_const, has_inf_nan, has_I, simplify
@@ -773,7 +774,7 @@ class CharSPEnvironment(object):
         expr = expr.split()
         return expr
 
-    @timeout(3)
+    @func_set_timeout(3)
     def gen_prim_fwd(self, rng):
         """
         Generate pairs of (function, primitive).
@@ -842,7 +843,7 @@ class CharSPEnvironment(object):
             if self.prim_stats[-1] % 500 == 0:
                 logger.debug(f"{self.worker_id:>2} PRIM STATS {self.prim_stats}")
 
-        except TimeoutError:
+        except FunctionTimedOut:
             raise
         except (ValueError, AttributeError, TypeError, OverflowError, NotImplementedError, UnknownSymPyOperator, ValueErrorExpression):
             return None
@@ -858,7 +859,7 @@ class CharSPEnvironment(object):
 
         return x, y
 
-    @timeout(5)
+    @func_set_timeout(5)
     def gen_prim_bwd(self, rng, predict_primitive):
         """
         Generate pairs of (function, derivative) or (function, primitive).
@@ -909,7 +910,7 @@ class CharSPEnvironment(object):
             if real_nb_ops < nb_ops / 2:
                 return None
 
-        except TimeoutError:
+        except FunctionTimedOut:
             raise
         except (ValueErrorExpression, UnknownSymPyOperator, OverflowError, TypeError):
             return None
@@ -932,7 +933,7 @@ class CharSPEnvironment(object):
     PRIM_CACHE = {}
     PRIM_COUNT = [0, 0]
 
-    @timeout(8)
+    @func_set_timeout(8)
     def gen_prim_ibp(self, rng):
         """
         Generate pairs of (function, primitive).
@@ -1057,7 +1058,7 @@ class CharSPEnvironment(object):
             if max(len(h_prefix), len(H_prefix)) + 2 > self.max_len:
                 return None
 
-        except TimeoutError:
+        except FunctionTimedOut:
             raise
         except (ValueErrorExpression, UnknownSymPyOperator, OverflowError, TypeError):
             return None
@@ -1073,7 +1074,7 @@ class CharSPEnvironment(object):
 
         return x, y
 
-    @timeout(8)
+    @func_set_timeout(8)
     def gen_ode1(self, rng):
         """
         Generate first order differential equations.
@@ -1160,7 +1161,7 @@ class CharSPEnvironment(object):
                 if len([y for y in eval_values if y <= ZERO_THRESHOLD]) / len(eval_values) < 0.2:
                     return None
 
-        except TimeoutError:
+        except FunctionTimedOut:
             raise
         except (ValueError, NotImplementedError, AttributeError, RecursionError, ValueErrorExpression, UnknownSymPyOperator):
             return None
@@ -1170,7 +1171,7 @@ class CharSPEnvironment(object):
 
         return eq_prefix, expr_prefix
 
-    @timeout(8)
+    @func_set_timeout(8)
     def gen_ode2(self, rng):
         """
         Generate second order differential equations.
@@ -1276,7 +1277,7 @@ class CharSPEnvironment(object):
                 if len([y for y in eval_values if y <= ZERO_THRESHOLD]) / len(eval_values) < 0.2:
                     return None
 
-        except TimeoutError:
+        except FunctionTimedOut:
             raise
         except (ValueError, NotImplementedError, AttributeError, RecursionError, ValueErrorExpression, UnknownSymPyOperator):
             return None
@@ -1503,7 +1504,7 @@ class EnvDataset(Dataset):
                     continue
                 x, y = xy
                 break
-            except TimeoutError:
+            except FunctionTimedOut:
                 continue
             except Exception as e:
                 logger.error("An unknown exception of type {0} occurred for worker {4} in line {1} for expression \"{2}\". Arguments:{3!r}.".format(type(e).__name__, sys.exc_info()[-1].tb_lineno, 'F', e.args, self.get_worker_id()))
