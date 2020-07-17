@@ -11,13 +11,13 @@ import argparse
 import numpy as np
 import torch
 
-import src
-from src.slurm import init_signal_handler, init_distributed_mode
-from src.utils import bool_flag, initialize_exp
-from src.model import check_model_params, build_modules
-from src.envs import ENVS, build_env
-from src.trainer import Trainer
-from src.evaluator import Evaluator
+from . import utils
+from .slurm import init_signal_handler, init_distributed_mode
+from .utils import bool_flag, initialize_exp
+from .model import check_model_params, build_modules
+from .envs import ENVS, build_env
+from .trainer import Trainer
+from .evaluator import Evaluator
 
 
 np.seterr(all='raise')
@@ -161,7 +161,7 @@ def main(params):
         assert not params.multi_gpu
     else:
         assert torch.cuda.is_available()
-    src.utils.CUDA = not params.cpu
+    utils.CUDA = not params.cpu
 
     # build environment / modules / trainer / evaluator
     env = build_env(params)

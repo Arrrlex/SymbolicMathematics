@@ -1,32 +1,20 @@
-from typing import Optional
+
+import traceback
 
 from sympy.parsing.latex import parse_latex
 import sympy as sp
 import torch
 from func_timeout import FunctionTimedOut
 
-from src.utils import to_cuda, load_settings
-from src.envs import build_env
-from src.model import build_modules
-from src.envs.sympy_utils import simplify
-from src.envs.char_sp import InvalidPrefixExpression
-
-def preprocess(expr):
-    e = sp.S('e')
-    exponential_subexprs = [subexpr 
-            for subexpr in sp.preorder_traversal(expr)
-            if subexpr.func == sp.Pow and subexpr.base == e]
-    fixed_subexprs = [sp.exp(subexpr.exp) for subexpr in exponential_subexprs]
-
-    fixed_expr = expr
-    for (old, new) in zip(exponential_subexprs, fixed_subexprs):
-        fixed_expr = fixed_expr.subs(old, new)
-
-    return fixed_expr
+from .utils import to_cuda, load_settings
+from .envs import build_env
+from .model import build_modules
+from .envs.sympy_utils import simplify
+from .envs.char_sp import InvalidPrefixExpression
 
 class Integrator(object):
-    def __init__(self, cpu, model_path):
-        self.params = load_settings(cpu=cpu, reload_model=model_path)
+    def __init__(self, **kwargs):
+        self.params = load_settings(**kwargs)
         self.env = build_env(self.params)
         
         self.modules = build_modules(self.env, self.params)
@@ -84,19 +72,22 @@ class Integrator(object):
 
     def integrate(self, f):
         try:
-            expr = parse_latex(f)
-            expr_fixed = preprocess(expr)
-            antiderivative = self.integrate_sympy(expr_fixed)
-        except Exception as e:
-            print("Error thrown assuming latex:", e)
+            antiderivative = self.integrate_latex(f)
+        except:
+            print("Error when interpreting as latex")
+            traceback.print_exc()
+
             try:
-                expr = sp.sympify(f, locals=self.env.local_dict)
-                print(sp.srepr(expr))
-                antiderivative = self.integrate_sympy(expr_fixed)
-            except Exception as e:
-                print("Error thrown assuming python:", e)
+                antiderivative = self.integrate_pyexpr(f)
+            except:
+                print("Error when interpreting as pyexpr")
+                traceback.print_exc()
                 return None
-        return sp.latex(antiderivative)
+
+        try:
+            return sp.latex(antiderivative)
+        except:
+            return None
 
     def integrate_pyexpr(self, f):
         expr = sp.sympify(f, locals=self.env.local_dict)
@@ -104,8 +95,17 @@ class Integrator(object):
 
     def integrate_latex(self, f):
         expr = parse_latex(f)
-        expr_fixed = preprocess(expr)
-        return self.integrate_sympy(expr_fixed)
+        
+        for var_name, variable in self.env.variables.items():
+            expr = expr.subs(sp.Symbol(var_name), variable)
+
+        for func_name, function in self.env.functions.items():
+            expr = expr.subs(sp.Function(func_name), function)
+        
+        for coeff_name, coefficient in self.env.coefficients.items():
+            expr = expr.subs(sp.Symbol(coeff_name), coefficient)
+
+        return self.integrate_sympy(expr)
     
     def integrate_sympy(self, expr):
         tensor, length = self.to_tensor(expr)
