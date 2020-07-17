@@ -101,7 +101,7 @@ class Integrator(object):
             expr = sympy.sympify(f, locals=self.env.local_dict)
             antiderivative = self.integrate_sympy(expr_fixed)
 
-        return latex(antiderivative)
+        return sympy.latex(antiderivative)
 
     def integrate_pyexpr(self, f):
         expr = sympy.sympify(f, locals=self.env.local_dict)
