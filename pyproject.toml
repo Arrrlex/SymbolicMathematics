@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "symbolicmathematics"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Guillaume Lample <glample@fb.com>", "François Charton <fcharton@fb.com>"]
 packages = [
