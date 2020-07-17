@@ -13,8 +13,8 @@ from .envs.sympy_utils import simplify
 from .envs.char_sp import InvalidPrefixExpression
 
 class Integrator(object):
-    def __init__(self, **kwargs):
-        self.params = load_settings(**kwargs)
+    def __init__(self, cpu, model_name=None, model_path=None, **kwargs):
+        self.params = load_settings(cpu=cpu, model_name=model_name, model_path=model_path, **kwargs)
         self.env = build_env(self.params)
         
         self.modules = build_modules(self.env, self.params)

@@ -36,7 +36,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-def load_settings(*, cpu, model_name=None, model_path=None, **override_defaults):
+def load_settings(cpu, model_name=None, model_path=None, **override_defaults):
     """
     Load default settings for project, with any required overrides.
 
